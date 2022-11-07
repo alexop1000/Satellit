@@ -11,7 +11,7 @@ import processing.data.JSONArray;
 import processing.data.JSONObject;
 
 public class App extends PApplet {
-    PVector convert(float lat, float lon, float h ) {
+    PVector PolarToCartesian(float lat, float lon, float h ) {
         float theta = radians(lat);
         float phi = radians(lon) + PI;
       
@@ -73,10 +73,12 @@ public class App extends PApplet {
             velocity.y *= -1;
         }
         */
+        
         velocity.mult(100);
         velocity.z = 0;
         println(pos);
         println(velocity);
+        
     }
     public void draw() {
         fill(255);
@@ -101,7 +103,7 @@ public class App extends PApplet {
         float lon = pos.y;
         float h = pos.z;
         
-        PVector currentPos = convert(lat, lon, h);
+        PVector currentPos = PolarToCartesian(lat, lon, h);
         PVector dir = new PVector(currentPos.x, currentPos.y, currentPos.z);
         float xAngle = PVector.angleBetween(X_AXIS, dir);
         PVector rotAxis = X_AXIS.cross(dir);
@@ -110,7 +112,8 @@ public class App extends PApplet {
         satellite = createShape(BOX,20, 20, 20);
 
         translate(width/2, height/2);
-        translate(currentPos.x, currentPos.y / 10, currentPos.z);
+        rotateY(earthRotation);
+        translate(currentPos.x, currentPos.y, currentPos.z);
         rotate(xAngle, rotAxis.x, rotAxis.y, rotAxis.z);
         fill(90,90,90);
         shape(satellite);
@@ -120,7 +123,7 @@ public class App extends PApplet {
         circle(width/2, height/2, 420);
     }
     public void mouseDragged() {
-        // earthRotation += radians(mouseX - pmouseX);
+        earthRotation += radians(mouseX - pmouseX);
     }
     
 
