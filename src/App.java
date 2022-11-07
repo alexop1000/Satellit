@@ -23,6 +23,8 @@ public class App extends PApplet {
         return new PVector(x, y, z);
     }
     float earthRotation = 0;
+    PVector velocity = new PVector(0, 0, 0);
+    PVector pos = new PVector(0, 0, 0);
     PImage earth;
     JSONObject json;
     PShape sphere;
@@ -58,6 +60,23 @@ public class App extends PApplet {
             e.printStackTrace();
         }
        
+        JSONArray positions = json.getJSONArray("positions");
+        JSONObject object = (JSONObject) positions.get(0);
+        
+        pos = new PVector(object.getFloat("satlatitude"), object.getFloat("satlongitude"), object.getFloat("sataltitude"));
+        
+        JSONObject object2 = (JSONObject) positions.get(1);
+        PVector nextPos = new PVector(object2.getFloat("satlatitude"), object2.getFloat("satlongitude"), object2.getFloat("sataltitude"));
+        velocity = PVector.sub(new PVector(abs(nextPos.x),abs(nextPos.y),abs(nextPos.z)), new PVector(abs(pos.x),abs(pos.y),abs(pos.z)));
+      /*  if (pos.x < 0) {
+            velocity.x *= -1;
+            velocity.y *= -1;
+        }
+        */
+        velocity.mult(100);
+        velocity.z = 0;
+        println(pos);
+        println(velocity);
     }
     public void draw() {
         fill(255);
@@ -76,32 +95,32 @@ public class App extends PApplet {
         lights();
         shape(sphere);
         popMatrix();
-        fill(255,255,255);
-        circle(width/2, height/2, 420);
 
-        JSONArray positions = json.getJSONArray("positions");
-        JSONObject object = (JSONObject) positions.get(0);
-        float lat = object.getFloat("satlatitude");
-        float lon = object.getFloat("satlongitude");
-        float h = object.getFloat("sataltitude");
+        pos.add(velocity);
+        float lat = pos.x;
+        float lon = pos.y;
+        float h = pos.z;
         
-        PVector currentPosition = convert(lat, lon, h + 200);
-        PVector dir = new PVector(-currentPosition.x, -currentPosition.z, currentPosition.y);
+        PVector currentPos = convert(lat, lon, h);
+        PVector dir = new PVector(currentPos.x, currentPos.y, currentPos.z);
         float xAngle = PVector.angleBetween(X_AXIS, dir);
         PVector rotAxis = X_AXIS.cross(dir);
 
         pushMatrix();
-        satellite = createShape(BOX,20);
+        satellite = createShape(BOX,20, 20, 20);
 
-        translate(currentPosition.x, currentPosition.y, currentPosition.z);
+        translate(width/2, height/2);
+        translate(currentPos.x, currentPos.y / 10, currentPos.z);
         rotate(xAngle, rotAxis.x, rotAxis.y, rotAxis.z);
+        fill(90,90,90);
         shape(satellite);
-       
 
         popMatrix();
+        fill(255,255,255);
+        circle(width/2, height/2, 420);
     }
     public void mouseDragged() {
-        earthRotation += radians(mouseX - pmouseX);
+        // earthRotation += radians(mouseX - pmouseX);
     }
     
 
