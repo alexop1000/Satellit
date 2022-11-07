@@ -1,0 +1,13 @@
+{
+    "java.project.sourcePaths": ["src", "res"],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": {
+        "include": [
+            "lib/**/*.jar"
+        ],
+        "exclude": [
+            "lib/jogamp-fat.jar"
+        ]
+    }
+    
+}
